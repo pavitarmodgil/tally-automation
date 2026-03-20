@@ -1,0 +1,22 @@
+{
+  "customer": "Customer A",
+  "date": "2025-04-01",
+  "voucherNumber": "2",
+  "items": [
+    {
+      "name": "Pen",
+      "qty": 10,
+      "finalPrice": 11.8
+    },
+    {
+      "name": "Notebook",
+      "qty": 5,
+      "finalPrice": 56
+    },
+    {
+      "name": "Marker",
+      "qty": 3,
+      "finalPrice": 29.5
+    }
+  ]
+}

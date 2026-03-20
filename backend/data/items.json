@@ -1,0 +1,17 @@
+{
+  "Pen": {
+    "rate": 10,
+    "gst": 18,
+    "unit": "pcs"
+  },
+  "Notebook": {
+    "rate": 50,
+    "gst": 12,
+    "unit": "pcs"
+  },
+  "Marker": {
+    "rate": 25,
+    "gst": 18,
+    "unit": "pcs"
+  }
+}

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment variables — never commit secrets
+.env
+.env.local
+.env.production
+.env.staging
+.env*.local
+
+# Build output
+dist/
+build/
+
+# Tally-generated XML files (runtime output, not source)
+backend/output/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Vite cache
+.vite/
