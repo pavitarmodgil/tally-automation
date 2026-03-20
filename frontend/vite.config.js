@@ -5,9 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api":       "http://localhost:5000",
-      "/whatsapp":  "http://localhost:5000",   // ← add this line
+      "/api":      "http://localhost:5000",
+      "/whatsapp": "http://localhost:5000",
     },
-
   },
 });
