@@ -143,7 +143,7 @@ app.get("/api/orders/:id", async (req, res) => {
 
 // POST /api/orders/:id/send
 // Admin clicks "Send to Tally"
-// Calculates GST, builds XML, saves file, marks order as sent
+// Calculates GST, builds XML, pushes directly to Tally HTTP server, marks order as sent
 app.post("/api/orders/:id/send", async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -161,37 +161,69 @@ app.post("/api/orders/:id/send", async (req, res) => {
 
     const totals = calculateTotals(calculatedItems);
 
-    // Generate voucher number from order creation date + short ID
+    // Generate voucher number
     const voucherNumber = `TA-${order._id.toString().slice(-6).toUpperCase()}`;
+
+    // Use TALLY_DATE from .env — required for Tally EDU which only accepts dates
+    // within its active financial year (e.g. 2025-04-01 to 2026-03-31).
+    // Set TALLY_DATE=2025-04-01 in .env to keep all entries on a safe fixed date.
+    const tallyDate = process.env.TALLY_DATE || "2025-04-01";
 
     // Build XML
     const xml = buildVoucherXML(
-      {
-        customer: order.customer,
-        date: order.createdAt.toISOString().split("T")[0],
-        voucherNumber,
-      },
+      { customer: order.customer, date: tallyDate, voucherNumber },
       calculatedItems,
       totals
     );
 
-    // Save XML file
+    // Save XML file (kept as manual fallback if Tally push fails)
     const fileName = `voucher_${order._id}.xml`;
     const filePath = path.join(OUTPUT_DIR, fileName);
     fs.writeFileSync(filePath, xml, "utf8");
 
-    // Mark order as sent
+    // Push XML directly to Tally HTTP server
+    const TALLY_URL = process.env.TALLY_URL || "http://localhost:9000";
+    let tallyResponseText;
+    try {
+      const tallyRes = await fetch(TALLY_URL, {
+        method:  "POST",
+        headers: { "Content-Type": "text/xml" },
+        body:    xml,
+      });
+      tallyResponseText = await tallyRes.text();
+      console.log("📦 Tally raw response:", tallyResponseText);
+    } catch (fetchErr) {
+      console.error("❌ Tally HTTP push failed:", fetchErr.message);
+      return res.status(503).json({
+        error:        "Could not reach Tally. Make sure TallyPrime is open.",
+        fileName,
+        manualImport: `O: Import → Transactions → select ${fileName}`,
+      });
+    }
+
+    // Tally returns STATUS=0 on failure, STATUS=1 on success
+    if (tallyResponseText.includes("<STATUS>0</STATUS>")) {
+      console.error("❌ Tally rejected the voucher:", tallyResponseText);
+      return res.status(422).json({
+        error:         "Tally rejected the voucher. Check company name, ledger names, and date.",
+        tallyResponse: tallyResponseText,
+        fileName,
+        manualImport:  `O: Import → Transactions → select ${fileName}`,
+      });
+    }
+
+    // Only mark as sent after Tally confirms success
     order.status        = "sent";
     order.voucherNumber = voucherNumber;
     order.sentAt        = new Date();
     await order.save();
 
     res.json({
-      success: true,
+      success:       true,
       voucherNumber,
       fileName,
       totals,
-      message: `Import via Tally Prime: O: Import → Transactions → select ${fileName}`,
+      tallyResponse: tallyResponseText,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
