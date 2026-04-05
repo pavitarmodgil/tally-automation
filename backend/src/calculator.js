@@ -57,12 +57,16 @@ function calculateTotals(calculatedItems) {
     { amount: 0, cgst: 0, sgst: 0, total: 0 }
   );
 
-  return {
-    amount: round(totals.amount),
-    cgst:   round(totals.cgst),
-    sgst:   round(totals.sgst),
-    total:  round(totals.total),
-  };
+  const amount = round(totals.amount);
+  const cgst   = round(totals.cgst);
+  const sgst   = round(totals.sgst);
+
+  // Derive total from the already-rounded amount/cgst/sgst.
+  // This guarantees Credit side (Sales+CGST+SGST) === Debit side (Customer)
+  // and prevents Tally's "Mismatch in total amount" exception.
+  const total  = round(amount + cgst + sgst);
+
+  return { amount, cgst, sgst, total };
 }
 
 /** Round to 2 decimal places */

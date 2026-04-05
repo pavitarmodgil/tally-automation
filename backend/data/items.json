@@ -1,17 +1,17 @@
 {
-  "Pen": {
-    "rate": 10,
-    "gst": 18,
+  "Kulfi_Punjabi_60ml": {
+    "rate": 286.286,
+    "gst": 5,
+    "unit": "bx"
+  },
+  "Vanilla_750ml_Combo": {
+    "rate": 75.15,
+    "gst": 5,
     "unit": "pcs"
   },
-  "Notebook": {
-    "rate": 50,
-    "gst": 12,
-    "unit": "pcs"
-  },
-  "Marker": {
-    "rate": 25,
-    "gst": 18,
-    "unit": "pcs"
+  "FrenchFries_2.5Kg": {
+    "rate": 114.29,
+    "gst": 5,
+    "unit": "PKT"
   }
 }

@@ -69,10 +69,10 @@ function buildInventoryEntry(item) {
   return `      <ALLINVENTORYENTRIES.LIST>
        <STOCKITEMNAME>${item.name}</STOCKITEMNAME>
        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-       <RATE>${item.rate}/pcs</RATE>
+       <RATE>${item.rate}/${item.unit}</RATE>
        <AMOUNT>-${item.amount}</AMOUNT>
-       <ACTUALQTY>${item.qty} pcs</ACTUALQTY>
-       <BILLEDQTY>${item.qty} pcs</BILLEDQTY>
+       <ACTUALQTY>${item.qty} ${item.unit}</ACTUALQTY>
+       <BILLEDQTY>${item.qty} ${item.unit}</BILLEDQTY>
        <ACCOUNTINGALLOCATIONS.LIST>
         <LEDGERNAME>Sales</LEDGERNAME>
         <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
